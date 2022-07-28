@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ReactServices.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReactServices
 {
@@ -25,6 +27,19 @@ namespace ReactServices
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddDbContext<DatabaseContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("myconn"));
+            });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Sudo API",
+                    Description = "React With DotNet",
+                    Version = "v1"
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +58,8 @@ namespace ReactServices
             {
                 endpoints.MapControllers();
             });
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReactServices Testing"));
         }
     }
 }
